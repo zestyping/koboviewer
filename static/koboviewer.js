@@ -87,8 +87,10 @@ function createLayers(records, features) {
   var layers = [];
   records.forEach(function (record) {
     features.forEach(function (feature) {
-      var style = selectRule(feature.style_rules, record).style || {};
-      var layer = createLayer(feature.type, record[feature.field], style);
+      var layer = createLayer(feature.type, record[feature.field], mergeStyles(
+          feature.style,
+          selectRule(feature.style_rules, record).style || {}
+      ));
       if (layer) layers.push(layer);
     });
   });
@@ -171,6 +173,18 @@ function matchSelector(record, selector) {
     case '==':
       return specimen === selector.value;
   }
+}
+
+/** Merges a set of style attributes on top of a base set of attributes. */
+function mergeStyles(base, override) {
+  var result = {};
+  for (var key in base) {
+    result[key] = base[key];
+  }
+  for (var key in override) {
+    result[key] = override[key];
+  }
+  return result;
 }
 
 /** Displays or hides a status message box. */
