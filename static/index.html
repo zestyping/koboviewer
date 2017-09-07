@@ -1,0 +1,32 @@
+<link rel="stylesheet" type="text/css" href="static/leaflet.css">
+<style>
+    body { margin: 0; font-family: helvetica; }
+    #map { width: 100%; height: 100%; }
+    #status { position: absolute; right: 0; top: 0; border: 1px solid #999; background: #fff; font-size: 14px; padding: 6px; margin: 6px; z-index: 1000; }
+</style>
+<script src="static/jquery-3.2.1.min.js"></script>
+<script src="static/leaflet.js"></script>
+<script src="static/config.js"></script>
+<script src="static/koboviewer.js"></script>
+
+<div id="map"></div>
+<div id="status"></div>
+
+<script>
+  var map = newOsmMap('map');
+  map.setView(new L.LatLng(-6.764, 39.250), 14);  // Mikocheni
+  setStatus('Loading forms...');
+  syncForms(function() {
+    var pointForm = forms[123];
+    var segmentForm = forms[124];
+    setStatus('Loading ' + pointForm.num_of_submissions + ' points...');
+    syncRecords(123, function() {
+      showRecords(123, map);
+      setStatus('Loading ' + segmentForm.num_of_submissions + ' segments...');
+      syncRecords(124, function() {
+        showRecords(124, map);
+        setStatus(null);
+      });
+    });
+  });
+</script>
