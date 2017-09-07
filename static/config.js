@@ -15,15 +15,19 @@ var config = {
           field: 'drain_line',
           style_rules: [
             {
-              selectors: [{field: 'drain_type', value: 'drain'}],
-              style: {color: '#0000ff', weight: 2}
-            },
-            {
               selectors: [{field: 'drain_type', value: 'culvert'}],
-              style: {color: '#ff0080', weight: 2}
+              style: {color: '#67c2dd', weight: 4}
             },
             {
-              style: {color: 'black', weight: 1}
+              selectors: [{field: 'drain_type', value: 'ditch'}],
+              style: {color: '#ff6795', weight: 4}
+            },
+            {
+              selectors: [{field: 'drain_type', value: 'drain'}],
+              style: {color: '#b148d4', weight: 4}
+            },
+            {
+              style: {color: '#e06840', weight: 4}
             }
           ]
         }
