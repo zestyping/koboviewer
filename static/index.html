@@ -1,3 +1,4 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <link rel="stylesheet" type="text/css" href="static/leaflet.css">
 <style>
     body { margin: 0; font-family: helvetica; }
@@ -15,6 +16,7 @@
 <script>
   var map = newOsmMap('map');
   map.setView(new L.LatLng(-6.764, 39.250), 14);  // Mikocheni
+  map.locate({setView: true, maxZoom: 15});
   setStatus('Loading forms...');
   syncForms(function() {
     var pointForm = forms[123];
