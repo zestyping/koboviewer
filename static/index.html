@@ -39,19 +39,53 @@
 <div id="locate" onclick="map.locate({setView: true, maxZoom: 15})"><img src="static/locate-24.png"></div>
 
 <script>
+  function loadForm(form, callback) {
+    var noun = (form.description.match(/drain_point/) ? 'points' :
+                form.description.match(/drain_segment/) ? 'segments' :
+                'records');
+    setStatus('Loading ' + form.description +
+              ' (' + form.num_of_submissions + ' ' + noun + ')...');
+    syncRecords(form.formid, function() {
+      showRecords(form.formid, map);
+      setStatus(null);
+      callback();
+    });
+  }
+
   var map = newOsmMap('map');
   map.setView(new L.LatLng(-6.764, 39.250), 14);  // Mikocheni
   setStatus('Loading forms...');
   syncForms(function() {
-    var pointForm = forms[123];
-    var segmentForm = forms[124];
-    setStatus('Loading ' + pointForm.num_of_submissions + ' points...');
-    syncRecords(123, function() {
-      showRecords(123, map);
-      setStatus('Loading ' + segmentForm.num_of_submissions + ' segments...');
-      syncRecords(124, function() {
-        showRecords(124, map);
-        setStatus(null);
+    var seg115 = forms[124];
+    var seg114 = forms[119];
+    var seg113 = forms[113];
+    var seg112 = forms[104];
+    var seg111 = forms[85];
+
+    var pt115 = forms[123];
+    var pt114 = forms[118];
+    var pt113 = forms[114];
+    var pt112 = forms[103];
+    var pt111 = forms[84];
+
+    loadForm(seg115, function() {
+      loadForm(pt115, function() {
+        loadForm(seg114, function() {
+          loadForm(pt114, function() {
+            loadForm(seg113, function() {
+              loadForm(pt113, function() {
+                loadForm(seg112, function() {
+                  loadForm(pt112, function() {
+                    loadForm(seg111, function() {
+                      loadForm(pt111, function() {
+                      });
+                    });
+                  });
+                });
+              });
+            });
+          });
+        });
       });
     });
   });
