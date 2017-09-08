@@ -117,13 +117,19 @@ function parsePolyline(geometry) {
     // WKT format: "LINESTRING ZM (lon lat alt acc, lon lat alt acc, ...)"
     match[1].split(/,/).forEach(function (point) {
       var coords = point.trim().split(/ /);
-      latlons.push([+coords[1], +coords[0]]);
+      var lat = +coords[1], lon = +coords[0];
+      if (!isNaN(lat) && !isNaN(lon)) {
+        latlons.push([lat, lon]);
+      }
     });
   } else {
     // JavaRosa format: "lat lon alt acc; lat lon alt acc; ..."
     geometry.split(/;/).forEach(function (point) {
       var coords = point.trim().split(/ /);
-      latlons.push([+coords[0], +coords[1]]);
+      var lat = +coords[0], lon = +coords[1];
+      if (!isNaN(lat) && !isNaN(lon)) {
+        latlons.push([lat, lon]);
+      }
     });
   }
   return latlons;
@@ -135,11 +141,17 @@ function parsePoint(geometry) {
   if (match) {
     // WKT format: "POINT ZM (lon lat alt acc)"
     var coords = match[1].trim().split(/ /);
-    return [+coords[1], +coords[0]];
+    var lat = +coords[1], lon = +coords[0];
+    if (!isNaN(lat) && !isNaN(lon)) {
+      return [lat, lon];
+    }
   } else {
     // JavaRosa format: "lat lon"
     var coords = geometry.trim().split(/ /);
-    return [+coords[0], +coords[1]];
+    var lat = +coords[0], lon = +coords[1];
+    if (!isNaN(lat) && !isNaN(lon)) {
+      return [lat, lon];
+    }
   }
 }
 
