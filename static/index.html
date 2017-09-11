@@ -6,7 +6,7 @@
     #status {
       position: absolute;
       right: 0;
-      top: 0;
+      top: 36px;
       margin: 6px;
       padding: 6px;
       border: 1px solid #999;
@@ -28,6 +28,17 @@
     }
     #locate:hover { background: #f4f4f4; }
     #locate img { margin: 3px; }
+    #times {
+      position: absolute;
+      right: 0;
+      top: 0;
+      margin: 6px;
+      padding: 6px;
+      border: 1px solid #999;
+      background: #fff;
+      font-size: 14px;
+      z-index: 1000;
+    }
 </style>
 <script src="static/jquery-3.2.1.min.js"></script>
 <script src="static/leaflet.js"></script>
@@ -37,8 +48,31 @@
 <div id="map"></div>
 <div id="status"></div>
 <div id="locate" onclick="map.locate({setView: true, maxZoom: 15})"><img src="static/locate-24.png"></div>
+<div id="times">
+  Show data collected since:
+  <select id="min-time">
+    <option value="2017-09-11">Sep 11</option>
+    <option value="2017-09-10">Sep 10</option>
+    <option value="2017-09-09">Sep 09</option>
+    <option value="2017-09-08">Sep 08</option>
+    <option value="2017-09-07">Sep 07</option>
+    <option value="2017-09-06">Sep 06</option>
+    <option value="2017-09-05">Sep 05</option>
+    <option value="2017-09-04">Sep 04</option>
+    <option value="2017-09-03">Sep 03</option>
+    <option value="2017-09-02">Sep 02</option>
+    <option value="2017-09-01">Sep 01</option>
+    <option value="2017-08-31">Aug 31</option>
+    <option value="2017-08-30">Aug 30</option>
+    <option value="2017-08-29">Aug 29</option>
+    <option value="2017-08-28">Aug 28</option>
+    <option value="2017-08-27">Aug 27</option>
+  </select>
+</div>
 
 <script>
+  var minTime = '2017-09-11';
+
   function loadForm(form, callback) {
     var noun = (form.description.match(/drain_point/) ? 'points' :
                 form.description.match(/drain_segment/) ? 'segments' :
@@ -46,11 +80,18 @@
     setStatus('Loading ' + form.description +
               ' (' + form.num_of_submissions + ' ' + noun + ')...');
     syncRecords(form.formid, function() {
-      showRecords(form.formid, map);
+      showRecords(map, form.formid, minTime);
       setStatus(null);
       callback();
     });
   }
+
+  $('#min-time').change(function() {
+    minTime = $('#min-time').val();
+    for (var formId in recordsByFormId) {
+      showRecords(map, formId, minTime);
+    }
+  });
 
   var map = newOsmMap('map');
   map.setView(new L.LatLng(-6.764, 39.250), 14);  // Mikocheni

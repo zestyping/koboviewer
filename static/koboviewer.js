@@ -18,25 +18,29 @@ function newOsmMap(elementId) {
 }
 
 /** Displays the geometry for a form's records on the map. */
-function showRecords(formId, map) {
+function showRecords(map, formId, minSubmissionTime) {
   if (!layersByFormId[formId]) {
     if (!recordsByFormId[formId]) {
-      syncRecords(formId, function () { showRecords(formId); });
+      syncRecords(formId, function () { showRecords(map, formId); });
     }
     layersByFormId[formId] = createLayers(
       recordsByFormId[formId],
       selectRule(config.form_rules, forms[formId]).features || []
     );
   }
-  layersByFormId[formId].forEach(function (layer) {
-    layer.addTo(map);
+  layersByFormId[formId].forEach(function (pair) {
+    if (pair.time >= minSubmissionTime) {
+      pair.layer.addTo(map);
+    } else {
+      pair.layer.removeFrom(map);
+    }
   });
 }
 
 /** Removes the geometry for a form's records from the map. */
-function hideRecords(formId, map) {
-  (layersByFormId[formId] || []).forEach(function (layer) {
-    layer.removeFrom(map);
+function hideRecords(map, formId) {
+  (layersByFormId[formId] || []).forEach(function (pair) {
+    pair.layer.removeFrom(map);
   });
 }
 
@@ -91,7 +95,7 @@ function createLayers(records, features) {
           feature.style,
           selectRule(feature.style_rules, record).style || {}
       ));
-      if (layer) layers.push(layer);
+      if (layer) layers.push({time: record['_submission_time'], layer: layer});
     });
   });
   return layers;
