@@ -9,10 +9,16 @@
       bottom: 0;
       margin: 6px;
       padding: 6px;
-      border: 1px solid #999;
-      background: #fff;
       font-size: 14px;
       z-index: 1000;
+    }
+    #status {
+      border: 1px solid #999;
+      background: #fff;
+      background-image: url('static/loading.gif');
+      background-repeat: no-repeat;
+      background-position: 2px 2px;
+      padding-left: 28px;
     }
     #locate {
       position: absolute;
@@ -50,29 +56,29 @@
 <div id="sync"><button>Check for new data</button></div>
 <div id="locate"><img src="static/locate-24.png"></div>
 <div id="times">
-  Show data collected since:
+  Show data from:
   <select id="min-time">
-    <option value="2017-09-11">Sep 11</option>
-    <option value="2017-09-10">Sep 10</option>
-    <option value="2017-09-09">Sep 09</option>
-    <option value="2017-09-08">Sep 08</option>
-    <option value="2017-09-07" selected>Sep 07</option>
-    <option value="2017-09-06">Sep 06</option>
-    <option value="2017-09-05">Sep 05</option>
-    <option value="2017-09-04">Sep 04</option>
-    <option value="2017-09-03">Sep 03</option>
-    <option value="2017-09-02">Sep 02</option>
-    <option value="2017-09-01">Sep 01</option>
-    <option value="2017-08-31">Aug 31</option>
-    <option value="2017-08-30">Aug 30</option>
-    <option value="2017-08-29">Aug 29</option>
-    <option value="2017-08-28">Aug 28</option>
-    <option value="2017-08-27">Aug 27</option>
+    <option value="2017-09-11" selected>Sep 11 until now</option>
+    <option value="2017-09-10">Sep 10 until now</option>
+    <option value="2017-09-09">Sep 9 until now</option>
+    <option value="2017-09-08">Sep 8 until now</option>
+    <option value="2017-09-07">Sep 7 until now</option>
+    <option value="2017-09-06">Sep 6 until now</option>
+    <option value="2017-09-05">Sep 5 until now</option>
+    <option value="2017-09-04">Sep 4 until now</option>
+    <option value="2017-09-03">Sep 3 until now</option>
+    <option value="2017-09-02">Sep 2 until now</option>
+    <option value="2017-09-01">Sep 1 until now</option>
+    <option value="2017-08-31">Aug 31 until now</option>
+    <option value="2017-08-30">Aug 30 until now</option>
+    <option value="2017-08-29">Aug 29 until now</option>
+    <option value="2017-08-28">Aug 28 until now</option>
+    <option value="2017-08-27">Aug 27 until now</option>
   </select>
 </div>
 
 <script>
-  var minTime = '2017-09-07';
+  var minTime = '2017-09-11';
 
   function loadForm(form, callback) {
     var noun = (form.description.match(/drain_point/) ? 'points' :
