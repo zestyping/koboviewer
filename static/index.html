@@ -55,7 +55,7 @@
     <option value="2017-09-10">Sep 10</option>
     <option value="2017-09-09">Sep 09</option>
     <option value="2017-09-08">Sep 08</option>
-    <option value="2017-09-07">Sep 07</option>
+    <option value="2017-09-07" selected>Sep 07</option>
     <option value="2017-09-06">Sep 06</option>
     <option value="2017-09-05">Sep 05</option>
     <option value="2017-09-04">Sep 04</option>
@@ -71,7 +71,7 @@
 </div>
 
 <script>
-  var minTime = '2017-09-11';
+  var minTime = '2017-09-07';
 
   function loadForm(form, callback) {
     var noun = (form.description.match(/drain_point/) ? 'points' :
@@ -115,6 +115,7 @@
           loadForm(pt114, function() {
             loadForm(seg113, function() {
               loadForm(pt113, function() {
+                return;
                 loadForm(seg112, function() {
                   loadForm(pt112, function() {
                     loadForm(seg111, function() {
