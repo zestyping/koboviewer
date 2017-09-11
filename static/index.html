@@ -168,12 +168,15 @@
   var locationUpdateInterval = null;
 
   var goToPosition = function(e) {
+    if (e.coords.accuracy > 100) return;
     var zoom = Math.max(map.getZoom(), 16);
     map.setView(L.latLng(e.coords.latitude, e.coords.longitude), zoom);
     updateLocationMarker(e);
   };
 
   var updateLocationMarker = function(e) {
+    if (e.coords.accuracy > 100) return;
+    var zoom = Math.max(map.getZoom(), 16);
     locationMarker.setLatLng(L.latLng(e.coords.latitude, e.coords.longitude));
     locationMarker.setRadius(e.coords.accuracy);
     locationMarker.addTo(map);
