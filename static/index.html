@@ -148,6 +148,7 @@
         locationMarker.setLatLng(e.latlng);
       });
       locationHandler = true;
+      setInterval(function() { map.locate({setView: false}); }, 1000);
     }
   });
 </script>
