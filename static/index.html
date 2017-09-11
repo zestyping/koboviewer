@@ -47,7 +47,7 @@
 
 <div id="map"></div>
 <div id="status"></div>
-<div id="locate" onclick="map.locate({setView: true, maxZoom: 15})"><img src="static/locate-24.png"></div>
+<div id="locate"><img src="static/locate-24.png"></div>
 <div id="times">
   Show data collected since:
   <select id="min-time">
@@ -130,5 +130,24 @@
         });
       });
     });
+  });
+
+  var locationMarker = null;
+  var locationHandler = null;
+  $('#locate').click(function() {
+    map.locate({setView: true, maxZoom: 15});
+    if (!locationHandler) {
+      map.on('locationfound', function(e) {
+        if (!locationMarker) {
+          locationMarker = L.circleMarker(
+            e.latlng,
+            {fillOpacity: 0.2, color: '#0000ff', fillColor: '#0000ff', radius: 8, stroke: true, weight: 1}
+          );
+          locationMarker.addTo(map);
+        }
+        locationMarker.setLatLng(e.latlng);
+      });
+      locationHandler = true;
+    }
   });
 </script>
