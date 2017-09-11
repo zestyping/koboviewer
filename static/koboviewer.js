@@ -206,10 +206,13 @@ function mergeStyles(base, override) {
 /** Displays or hides a status message box. */
 function setStatus(message) {
   var status = document.getElementById('status');
+  var sync = document.getElementById('sync');
   if (message) {
     status.innerText = message;
     status.style.display = 'block';
+    sync.style.display = 'none';
   } else {
     status.style.display = 'none';
+    sync.style.display = 'block';
   }
 }

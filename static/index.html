@@ -3,10 +3,10 @@
 <style>
     body { margin: 0; font-family: helvetica; }
     #map { width: 100%; height: 100%; }
-    #status {
+    #status, #sync {
       position: absolute;
-      right: 0;
-      top: 36px;
+      left: 0;
+      bottom: 0;
       margin: 6px;
       padding: 6px;
       border: 1px solid #999;
@@ -47,6 +47,7 @@
 
 <div id="map"></div>
 <div id="status"></div>
+<div id="sync"><button>Check for new data</button></div>
 <div id="locate"><img src="static/locate-24.png"></div>
 <div id="times">
   Show data collected since:
@@ -127,6 +128,23 @@
               });
             });
           });
+        });
+      });
+    });
+
+    $('#sync').click(function() {
+      var fi = 124, form = forms[fi];
+      setStatus('Refreshing ' + form.description + '...');
+      syncRecords(fi, function() {
+        var fi = 124, form = forms[fi];
+        showRecords(map, fi, minTime);
+
+        var fi = 123, form = forms[fi];
+        setStatus('Refreshing ' + form.description + '...');
+        syncRecords(fi, function() {
+          var fi = 123, form = forms[fi];
+          showRecords(map, fi, minTime);
+          setStatus(null);
         });
       });
     });
