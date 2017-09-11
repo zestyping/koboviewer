@@ -101,7 +101,7 @@
   });
 
   var map = newOsmMap('map');
-  map.setView(new L.LatLng(-6.764, 39.250), 14);  // Mikocheni
+  map.setView(L.latLng(-6.764, 39.250), 14);  // Mikocheni
   setStatus('Loading forms...');
   syncForms(function() {
     var seg115 = forms[124];
@@ -156,23 +156,35 @@
     });
   });
 
-  var locationMarker = null;
-  var locationHandler = null;
+  var LOCATION_MARKER_STYLE = {
+    color: '#0000ff',
+    fillColor: '#0000ff',
+    fillOpacity: 0.2,
+    stroke: true,
+    weight: 1,
+    radius: 8
+  };
+  var locationMarker = L.circle(L.latLng(0, 0), LOCATION_MARKER_STYLE);
+  var locationUpdateInterval = null;
+
+  var goToPosition = function(e) {
+    var zoom = Math.max(map.getZoom(), 16);
+    map.setView(L.latLng(e.coords.latitude, e.coords.longitude), zoom);
+    updateLocationMarker(e);
+  };
+
+  var updateLocationMarker = function(e) {
+    locationMarker.setLatLng(L.latLng(e.coords.latitude, e.coords.longitude));
+    locationMarker.setRadius(e.coords.accuracy);
+    locationMarker.addTo(map);
+  };
+
   $('#locate').click(function() {
-    map.locate({setView: true, maxZoom: 15});
-    if (!locationHandler) {
-      map.on('locationfound', function(e) {
-        if (!locationMarker) {
-          locationMarker = L.circleMarker(
-            e.latlng,
-            {fillOpacity: 0.2, color: '#0000ff', fillColor: '#0000ff', radius: 8, stroke: true, weight: 1}
-          );
-          locationMarker.addTo(map);
-        }
-        locationMarker.setLatLng(e.latlng);
-      });
-      locationHandler = true;
-      setInterval(function() { map.locate({setView: false}); }, 1000);
+    navigator.geolocation.getCurrentPosition(goToPosition);
+    if (!locationUpdateInterval) {
+      locationUpdateInterval = setInterval(function() {
+        navigator.geolocation.getCurrentPosition(updateLocationMarker);
+      }, 1000);
     }
   });
 </script>
