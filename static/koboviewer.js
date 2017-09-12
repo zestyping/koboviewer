@@ -1,6 +1,17 @@
 var OSM_ATTRIBUTION = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
 var map;
-var status;
+var locationMarker = L.circle(L.latLng(0, 0), {
+  color: '#0000ff',
+  fillColor: '#0000ff',
+  fillOpacity: 0.2,
+  stroke: true,
+  weight: 1,
+  radius: 8
+});
+
+var currentLatLng;
+var zoomToPositionPending = false;
+var positionWatchId;
 
 var forms = {};
 var recordsByFormId = {};
@@ -15,6 +26,48 @@ function newOsmMap(elementId) {
     {minZoom: 8, maxZoom: 20, attribution: OSM_ATTRIBUTION, opacity: 0.6}
   ));
   return map;
+}
+
+/** Handles a position update event from the Geolocation API. */
+function updatePosition(e, onFix) {
+  debug('Update position: ' + e.coords.latitude.toFixed(4) + ', ' +
+        e.coords.longitude.toFixed(4) + ' @ ' +
+        e.coords.accuracy.toFixed(1) + ' m');
+  if (e.coords.accuracy < 400) {  // ignore fixes coarser than 400 m
+    currentLatLng = L.latLng(e.coords.latitude, e.coords.longitude);
+    locationMarker.setLatLng(currentLatLng);
+    locationMarker.setRadius(e.coords.accuracy);
+    locationMarker.addTo(map);
+    if (zoomToPositionPending) {
+      zoomToPositionPending = false;
+      zoomToCurrentLocation();
+    }
+    onFix();
+  }
+}
+ 
+function zoomToCurrentLocation(onFix) {
+  if (currentLatLng) {
+    map.setView(currentLatLng, Math.max(map.getZoom(), 16));
+    return true;
+  } else {
+    debug('Waiting for first location fix...');
+    zoomToPositionPending = true;
+    startWatchingPosition(onFix);
+    return false;
+  }
+}
+
+function startWatchingPosition(onFix) {
+  if (!positionWatchId) {
+    positionWatchId = navigator.geolocation.watchPosition(function(e) {
+      updatePosition(e, onFix);
+    }, null, {
+      enableHighAccuracy: true,
+      timeout: 60000,
+      maximumAge: 5000
+    });
+  }
 }
 
 /** Displays the geometry for a form's records on the map. */
@@ -214,5 +267,13 @@ function setStatus(message) {
   } else {
     status.style.display = 'none';
     sync.style.display = 'block';
+  }
+}
+
+/** Displays or hides a debug message box, enabled by "#debug" in the URL. */
+function debug(message) {
+  if (window.location.hash == '#debug') {
+    $('#debug').text(message);
+    message ? $('#debug').show() : $('#debug').hide();
   }
 }

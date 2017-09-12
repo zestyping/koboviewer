@@ -73,13 +73,6 @@
 <script>
   var minTime = '2017-09-11';
 
-  function debug(message) {
-    if (window.location.hash == '#debug') {
-      $('#debug').text(message);
-      message ? $('#debug').show() : $('#debug').hide();
-    }
-  }
-
   function loadForm(form, callback) {
     var noun = (form.description.match(/drain_point/) ? 'points' :
                 form.description.match(/drain_segment/) ? 'segments' :
@@ -156,53 +149,12 @@
     });
   });
 
-  var LOCATION_MARKER_STYLE = {
-    color: '#0000ff',
-    fillColor: '#0000ff',
-    fillOpacity: 0.2,
-    stroke: true,
-    weight: 1,
-    radius: 8
-  };
-  var locationMarker = L.circle(L.latLng(0, 0), LOCATION_MARKER_STYLE);
-  var watchId = null;
-  var zoomToPositionPending = false;
-  var currentLatLng = null;
-
-  var zoomToCurrentLocation = function() {
-    debug('Zoom to: ' + currentLatLng.lat.toFixed(4) + ', ' + currentLatLng.lng.toFixed(4));
-    map.setView(currentLatLng, Math.max(map.getZoom(), 16));
-  };
-
-  var updatePosition = function(e) {
-    debug('Update position: ' + e.coords.latitude.toFixed(4) + ', ' + e.coords.longitude.toFixed(4) + ' @ ' + e.coords.accuracy.toFixed(1) + ' m');
-    if (e.coords.accuracy < 400) {  // ignore fixes coarser than 400 m
-      currentLatLng = L.latLng(e.coords.latitude, e.coords.longitude);
-      locationMarker.setLatLng(currentLatLng);
-      locationMarker.setRadius(e.coords.accuracy);
-      locationMarker.addTo(map);
-      $('#locate img').attr('src', 'static/locate-24.png');
-      if (zoomToPositionPending) {
-        zoomToPositionPending = false;
-        zoomToCurrentLocation();
-      }
-    }
-  };
-
   $('#locate').click(function() {
-    if (currentLatLng) {
-      zoomToCurrentLocation();
-    } else {
-      debug('Waiting for first location fix...');
+    var zoomed = zoomToCurrentLocation(function() {
+      $('#locate img').attr('src', 'static/locate-24.png');
+    });
+    if (!zoomed) {
       $('#locate img').attr('src', 'static/loading.gif');
-      zoomToPositionPending = true;
-    }
-    if (!watchId) {
-      watchId = navigator.geolocation.watchPosition(updatePosition, null, {
-        enableHighAccuracy: true,
-        timeout: 60000,
-        maximumAge: 5000
-      });
     }
   });
 </script>
