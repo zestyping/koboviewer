@@ -46,6 +46,11 @@ function updatePosition(e, onFix) {
   }
 }
  
+/**
+ * Zooms the map view to the current location if known; otherwise initiates
+ * a request for the current location and ensures that the map view will be
+ * zoomed when a location fix becomes available.
+ */
 function zoomToCurrentLocation(onFix) {
   if (currentLatLng) {
     map.setView(currentLatLng, Math.max(map.getZoom(), 16));
@@ -58,6 +63,7 @@ function zoomToCurrentLocation(onFix) {
   }
 }
 
+/** Sets up updatePosition to be called on each new location fix. */
 function startWatchingPosition(onFix) {
   if (!positionWatchId) {
     positionWatchId = navigator.geolocation.watchPosition(function(e) {
