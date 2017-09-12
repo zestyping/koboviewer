@@ -3,18 +3,21 @@
 <style>
     body { margin: 0; font-family: helvetica; }
     #map { width: 100%; height: 100%; }
-    #status, #sync {
+    #status, #times, #debug, #sync {
       position: absolute;
-      left: 0;
-      bottom: 0;
       margin: 6px;
       padding: 6px;
       font-size: 14px;
       z-index: 1000;
     }
-    #status {
-      border: 1px solid #999;
+    #status, #times, #debug {
+      border: 1px solid #bbb;
       background: #fff;
+    }
+    #status, #sync { left: 0; bottom: 0; }
+    #times { right: 0; top: 0; }
+    #debug { left: 48px; top: 0; font-size: 12px; display: none; }
+    #status {
       background-image: url('static/loading.gif');
       background-repeat: no-repeat;
       background-position: 2px 2px;
@@ -34,17 +37,6 @@
     }
     #locate:hover { background: #f4f4f4; }
     #locate img { margin: 3px; }
-    #times {
-      position: absolute;
-      right: 0;
-      top: 0;
-      margin: 6px;
-      padding: 6px;
-      border: 1px solid #999;
-      background: #fff;
-      font-size: 14px;
-      z-index: 1000;
-    }
 </style>
 <script src="static/jquery-3.2.1.min.js"></script>
 <script src="static/leaflet.js"></script>
@@ -55,6 +47,7 @@
 <div id="status"></div>
 <div id="sync"><button>Check for new data</button></div>
 <div id="locate"><img src="static/locate-24.png"></div>
+<div id="debug"></div>
 <div id="times">
   Show data from:
   <select id="min-time">
@@ -79,6 +72,13 @@
 
 <script>
   var minTime = '2017-09-11';
+
+  function debug(message) {
+    if (window.location.hash == '#debug') {
+      $('#debug').text(message);
+      message ? $('#debug').show() : $('#debug').hide();
+    }
+  }
 
   function loadForm(form, callback) {
     var noun = (form.description.match(/drain_point/) ? 'points' :
@@ -165,29 +165,44 @@
     radius: 8
   };
   var locationMarker = L.circle(L.latLng(0, 0), LOCATION_MARKER_STYLE);
-  var locationUpdateInterval = null;
+  var watchId = null;
+  var zoomToPositionPending = false;
+  var currentLatLng = null;
 
-  var goToPosition = function(e) {
-    if (e.coords.accuracy > 100) return;
-    var zoom = Math.max(map.getZoom(), 16);
-    map.setView(L.latLng(e.coords.latitude, e.coords.longitude), zoom);
-    updateLocationMarker(e);
+  var zoomToCurrentLocation = function() {
+    debug('Zoom to: ' + currentLatLng.lat.toFixed(4) + ', ' + currentLatLng.lng.toFixed(4));
+    map.setView(currentLatLng, Math.max(map.getZoom(), 16));
   };
 
-  var updateLocationMarker = function(e) {
-    if (e.coords.accuracy > 100) return;
-    var zoom = Math.max(map.getZoom(), 16);
-    locationMarker.setLatLng(L.latLng(e.coords.latitude, e.coords.longitude));
-    locationMarker.setRadius(e.coords.accuracy);
-    locationMarker.addTo(map);
+  var updatePosition = function(e) {
+    debug('Update position: ' + e.coords.latitude.toFixed(4) + ', ' + e.coords.longitude.toFixed(4) + ' @ ' + e.coords.accuracy.toFixed(1) + ' m');
+    if (e.coords.accuracy < 400) {  // ignore fixes coarser than 400 m
+      currentLatLng = L.latLng(e.coords.latitude, e.coords.longitude);
+      locationMarker.setLatLng(currentLatLng);
+      locationMarker.setRadius(e.coords.accuracy);
+      locationMarker.addTo(map);
+      $('#locate img').attr('src', 'static/locate-24.png');
+      if (zoomToPositionPending) {
+        zoomToPositionPending = false;
+        zoomToCurrentLocation();
+      }
+    }
   };
 
   $('#locate').click(function() {
-    navigator.geolocation.getCurrentPosition(goToPosition);
-    if (!locationUpdateInterval) {
-      locationUpdateInterval = setInterval(function() {
-        navigator.geolocation.getCurrentPosition(updateLocationMarker);
-      }, 1000);
+    if (currentLatLng) {
+      zoomToCurrentLocation();
+    } else {
+      debug('Waiting for first location fix...');
+      $('#locate img').attr('src', 'static/loading.gif');
+      zoomToPositionPending = true;
+    }
+    if (!watchId) {
+      watchId = navigator.geolocation.watchPosition(updatePosition, null, {
+        enableHighAccuracy: true,
+        timeout: 60000,
+        maximumAge: 5000
+      });
     }
   });
 </script>
