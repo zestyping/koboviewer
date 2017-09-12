@@ -283,3 +283,26 @@ function debug(message) {
     message ? $('#debug').show() : $('#debug').hide();
   }
 }
+
+/** Converts a JavaScript Date object to a calendar date in yyyy-mm-dd form. */
+function toYmd(date) {
+  var year = date.getFullYear();
+  var month = date.getMonth() + 1;  // .getMonth() returns a month from 0 to 11
+  var day = date.getDate();  // .getDate() returns the day of the month
+  return ('0000' + year).substr(-4) + '-' +
+         ('00' + month).substr(-2) + '-' +
+         ('00' + day).substr(-2);
+}
+
+/** Adds the specified number of days to a yyyy-mm-dd date. */
+function plusDays(ymd, days) {
+  return toYmd(new Date(Date.parse(ymd + ' 12:00') + days * 24 * 3600 * 1000));
+}
+
+/** Converts a date from yyyy-mm-dd format to "Sep 7" format. */
+function formatShortYmd(ymd) {
+  var months = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(/ /);
+  var month = +ymd.substr(5, 2);
+  var day = +ymd.substr(-2);
+  return months[month - 1] + ' ' + day;
+}
