@@ -49,7 +49,7 @@
 <div id="locate"><img src="static/locate-24.png"></div>
 <div id="debug"></div>
 <div id="times">
-  Show:
+  Show data:
   <select id="min-time"></select>
 </div>
 
@@ -62,14 +62,14 @@
     $('#min-time').append(
       $('<option>')
         .attr({value: ymd, selected: (i == 0) ? 'selected' : null})
-        .text('data added on ' + formatShortYmd(ymd) + ' or later')
+        .text('added on ' + formatShortYmd(ymd) + ' or later')
     );
     ymd = plusDays(ymd, -1);
   }
   $('#min-time').append(
     $('<option>')
       .attr({value: '0000-00-00'})
-      .text('all data')
+      .text('from all submissions')
   );
 
   function loadForm(form, callback) {
