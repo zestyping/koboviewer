@@ -54,10 +54,11 @@
 </div>
 
 <script>
-  // Let the user filter data starting from up to 15 days in the past.
+  // Let the user filter data starting from a selected date in the past.
+  var NUM_PAST_DAYS = 30;
   var ymd = toYmd(new Date());
   var minTime = ymd;  // default filter: just show data from today
-  for (var i = 0; i < 15; i++) {
+  for (var i = 0; i < NUM_PAST_DAYS; i++) {
     $('#min-time').append(
       $('<option>')
         .attr({value: ymd, selected: (i == 0) ? 'selected' : null})
