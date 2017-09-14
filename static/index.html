@@ -49,23 +49,28 @@
 <div id="locate"><img src="static/locate-24.png"></div>
 <div id="debug"></div>
 <div id="times">
-  Show data collected:
+  Show:
   <select id="min-time"></select>
 </div>
 
 <script>
   // Let the user filter data starting from a selected date in the past.
-  var NUM_PAST_DAYS = 30;
+  var NUM_PAST_DAYS = 15;
   var ymd = toYmd(new Date());
   var minTime = ymd;  // default filter: just show data from today
   for (var i = 0; i < NUM_PAST_DAYS; i++) {
     $('#min-time').append(
       $('<option>')
         .attr({value: ymd, selected: (i == 0) ? 'selected' : null})
-        .text('on ' + formatShortYmd(ymd) + ' or later')
+        .text('data added on ' + formatShortYmd(ymd) + ' or later')
     );
     ymd = plusDays(ymd, -1);
   }
+  $('#min-time').append(
+    $('<option>')
+      .attr({value: '0000-00-00'})
+      .text('all data')
+  );
 
   function loadForm(form, callback) {
     var noun = (form.description.match(/drain_point/) ? 'points' :
@@ -109,7 +114,6 @@
           loadForm(pt114, function() {
             loadForm(seg113, function() {
               loadForm(pt113, function() {
-                return;
                 loadForm(seg112, function() {
                   loadForm(pt112, function() {
                     loadForm(seg111, function() {
