@@ -152,7 +152,7 @@ function createLayers(records, features) {
     features.forEach(function (feature) {
       var layer = createLayer(feature.type, record[feature.field], mergeStyles(
           feature.style,
-          selectRule(feature.style_rules, record).style || {}
+          selectRule(feature.style_rules || [], record).style || {}
       ));
       if (layer) layers.push({time: record['_submission_time'], layer: layer});
     });

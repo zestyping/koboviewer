@@ -88,6 +88,22 @@ var config = {
           ]
         }
       ]
+    },
+    {
+      name: 'Special comments',
+      selectors: [{
+          field: 'description',
+          operator: 'prefix',
+          value: 'RH_drain_special_comment_'
+        }
+      ],
+      features: [
+        {
+          type: 'point',
+          field: 'drain_point',
+          style: {color: '#000000', fillOpacity: 0, stroke: true, weight: 2, radius: 3}
+        }
+      ]
     }
   ]
 };
