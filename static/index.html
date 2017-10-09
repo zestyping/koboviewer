@@ -160,12 +160,12 @@
     });
   });
 
+  showLocationOnMap(map);
   $('#locate').click(function() {
-    var zoomed = zoomToCurrentLocation(function() {
+    $('#locate img').attr('src', 'static/loading.gif');
+    doUponFix(function (latLng) {
+      zoomToLocation(map, latLng);
       $('#locate img').attr('src', 'static/locate-24.png');
     });
-    if (!zoomed) {
-      $('#locate img').attr('src', 'static/loading.gif');
-    }
   });
 </script>

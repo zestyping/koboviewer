@@ -1,6 +1,6 @@
 var OSM_ATTRIBUTION = 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
 var map;
-var locationMarker = L.circle(L.latLng(0, 0), {
+var currentLocationMarker = L.circle(L.latLng(0, 0), {
   color: '#0000ff',
   fillColor: '#0000ff',
   fillOpacity: 0.2,
@@ -10,8 +10,8 @@ var locationMarker = L.circle(L.latLng(0, 0), {
 });
 
 var currentLatLng;
-var zoomToPositionPending = false;
 var positionWatchId;
+var pendingLocationFixCallback;
 
 var forms = {};
 var recordsByFormId = {};
@@ -28,46 +28,16 @@ function newOsmMap(elementId) {
   return map;
 }
 
-/** Handles a position update event from the Geolocation API. */
-function updatePosition(e, onFix) {
-  debug('Update position: ' + e.coords.latitude.toFixed(4) + ', ' +
-        e.coords.longitude.toFixed(4) + ' @ ' +
-        e.coords.accuracy.toFixed(1) + ' m');
-  if (e.coords.accuracy < 400) {  // ignore fixes coarser than 400 m
-    currentLatLng = L.latLng(e.coords.latitude, e.coords.longitude);
-    locationMarker.setLatLng(currentLatLng);
-    locationMarker.setRadius(e.coords.accuracy);
-    locationMarker.addTo(map);
-    if (zoomToPositionPending) {
-      zoomToPositionPending = false;
-      zoomToCurrentLocation();
-    }
-    onFix();
-  }
-}
- 
-/**
- * Zooms the map view to the current location if known; otherwise initiates
- * a request for the current location and ensures that the map view will be
- * zoomed when a location fix becomes available.
- */
-function zoomToCurrentLocation(onFix) {
-  if (currentLatLng) {
-    map.setView(currentLatLng, Math.max(map.getZoom(), 16));
-    return true;
-  } else {
-    debug('Waiting for first location fix...');
-    zoomToPositionPending = true;
-    startWatchingPosition(onFix);
-    return false;
-  }
+/** Zooms and centers a map upon the given location. */
+function zoomToLocation(map, latLng) {
+  map.setView(latLng, Math.max(map.getZoom(), 16));
 }
 
-/** Sets up updatePosition to be called on each new location fix. */
-function startWatchingPosition(onFix) {
+/** Shows the current location as a continuously updated blue circle. */
+function showLocationOnMap(map) {
   if (!positionWatchId) {
-    positionWatchId = navigator.geolocation.watchPosition(function(e) {
-      updatePosition(e, onFix);
+    positionWatchId = navigator.geolocation.watchPosition(function (e) {
+      handleLocationEvent(e, map);
     }, null, {
       enableHighAccuracy: true,
       timeout: 60000,
@@ -76,7 +46,35 @@ function startWatchingPosition(onFix) {
   }
 }
 
-/** Displays the geometry for a form's records on the map. */
+/** Handles a location event by updating the location marker on the map. */
+function handleLocationEvent(e, map) {
+  debug('Update location: ' + e.coords.latitude.toFixed(4) + ', ' +
+        e.coords.longitude.toFixed(4) + ' @ ' +
+        e.coords.accuracy.toFixed(1) + ' m');
+  if (e.coords.accuracy < 400) {  // ignore fixes coarser than 400 m
+    currentLatLng = L.latLng(e.coords.latitude, e.coords.longitude);
+    currentLocationMarker.setLatLng(currentLatLng);
+    currentLocationMarker.setRadius(e.coords.accuracy);
+    currentLocationMarker.addTo(map);
+    if (pendingLocationFixCallback) {
+      pendingLocationFixCallback(currentLatLng);
+      pendingLocationFixCallback = null;
+    }
+  }
+}
+
+/** If the current location is known, immediately calls onFix(); otherwise
+    ensures that onFix() will be called when a location fix is found. */
+function doUponFix(onFix) {
+  if (currentLatLng) {
+    onFix(currentLatLng);
+  } else {
+    debug('Waiting for first location fix...');
+    pendingLocationFixCallback = onFix;
+  }
+}
+
+/** Puts the geometry for a form's records on the map, loading it if needed. */
 function showRecords(map, formId, minSubmissionTime) {
   if (!layersByFormId[formId]) {
     if (!recordsByFormId[formId]) {
