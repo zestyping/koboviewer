@@ -150,21 +150,29 @@
     });
 
     $('#sync').click(function() {
-      var fi = 124, form = forms[fi];
+      var fi = 167, form = forms[fi];
       setStatus('Refreshing ' + form.description + '...');
       syncRecords(fi, function() {
-        var fi = 124, form = forms[fi];
+        var fi = 167, form = forms[fi];
         showRecords(map, fi, minTime);
 
-        var fi = 123, form = forms[fi];
+        var fi = 171, form = forms[fi];
         setStatus('Refreshing ' + form.description + '...');
         syncRecords(fi, function() {
-          var fi = 123, form = forms[fi];
+          var fi = 171, form = forms[fi];
           showRecords(map, fi, minTime);
-          setStatus(null);
+
+          var fi = 170, form = forms[fi];
+          setStatus('Refreshing ' + form.description + '...');
+          syncRecords(fi, function() {
+            var fi = 170, form = forms[fi];
+            showRecords(map, fi, minTime);
+            setStatus(null);
+          });
         });
       });
     });
+
   });
 
   showLocationOnMap(map);
