@@ -36,7 +36,7 @@ var config = {
       name: 'Drain points',
       selectors: [{
           field: 'description',
-          operator: 'prefix',
+          operator: 'regex',
           value: '[A-Z]+_drain_point_',
           options: 'i'
         }
@@ -95,7 +95,7 @@ var config = {
       name: 'Special comments',
       selectors: [{
           field: 'description',
-          operator: 'prefix',
+          operator: 'regex',
           value: '[A-Z]+_drain_special_comment_',
           options: 'i'
         }
