@@ -239,6 +239,8 @@ function matchSelectors(record, selectors) {
 function matchSelector(record, selector) {
   var specimen = record[selector.field];
   switch (selector.operator || '==') {
+    case 'regex':
+      return new RegExp(selector.value, selector.options || '').exec(specimen);
     case 'prefix':
       return specimen.startsWith(selector.value);
     case 'suffix':

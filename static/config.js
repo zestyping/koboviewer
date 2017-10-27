@@ -5,8 +5,9 @@ var config = {
       name: 'Drain segments',
       selectors: [{
           field: 'description',
-          operator: 'prefix',
-          value: 'RH_drain_segment_'
+          operator: 'regex',
+          value: '[A-Z]+_drain_segment_',
+          options: 'i'
         }
       ],
       features: [
@@ -36,7 +37,8 @@ var config = {
       selectors: [{
           field: 'description',
           operator: 'prefix',
-          value: 'RH_drain_point_'
+          value: '[A-Z]+_drain_point_',
+          options: 'i'
         }
       ],
       features: [
@@ -94,7 +96,8 @@ var config = {
       selectors: [{
           field: 'description',
           operator: 'prefix',
-          value: 'RH_drain_special_comment_'
+          value: '[A-Z]+_drain_special_comment_',
+          options: 'i'
         }
       ],
       features: [
