@@ -25,7 +25,8 @@ For example, to make the Koboviewer map available at
 edit the file `kobo-docker/nginx/nginx_site_https.conf.tmpl`
 and insert these lines:
 
-    location /map {
+    rewrite ^/map$ /map/ permanent;
+    location /map/ {
         proxy_pass http://127.0.0.1:5000/;
     }
 
